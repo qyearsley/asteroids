@@ -24,7 +24,7 @@ def main():
 
     # Create sprite groups for game object management
     updatable = pygame.sprite.Group()  # Objects that need update() called
-    drawable = pygame.sprite.Group()   # Objects that need draw() called
+    drawable = pygame.sprite.Group()  # Objects that need draw() called
     asteroids = pygame.sprite.Group()  # Asteroids for collision detection
     shots = pygame.sprite.Group()
 
@@ -60,6 +60,11 @@ def main():
                 logger.log_event("player_hit")
                 print("Game over!")
                 sys.exit()
+            for s in shots:
+                if x.collides_with(s):
+                    logger.log_event("asteroid_shot")
+                    x.kill()
+                    s.kill()
 
         # Draw all game objects.
         for x in drawable:

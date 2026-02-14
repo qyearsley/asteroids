@@ -2,13 +2,22 @@ import pygame
 
 from circleshape import CircleShape
 from shot import Shot
-from constants import PLAYER_RADIUS, PLAYER_TURN_SPEED, PLAYER_SPEED, LINE_WIDTH, PLAYER_SHOOT_SPEED
+from constants import (
+    PLAYER_RADIUS,
+    PLAYER_SHOOT_COOLDOWN_SECONDS,
+    PLAYER_TURN_SPEED,
+    PLAYER_SPEED,
+    LINE_WIDTH,
+    PLAYER_SHOOT_SPEED,
+    PLAYER_SHOOT_COOLDOWN_SECONDS,
+)
 
 
 class Player(CircleShape):
     def __init__(self, x, y):
         super().__init__(x, y, PLAYER_RADIUS)
         self.rotation = 0
+        self.shot_cooldown_timer = 0
 
     def triangle(self):
         # Calculate triangle vertices for the player ship
@@ -39,6 +48,7 @@ class Player(CircleShape):
             self.move(-dt)
         if keys[pygame.K_SPACE]:
             self.shoot()
+        self.shot_cooldown_timer -= dt
 
     def move(self, dt):
         # Create unit vector pointing up (0, 1)
@@ -50,17 +60,13 @@ class Player(CircleShape):
         self.position += rotated_with_speed_vector
 
     def shoot(self):
-        """Creates a new Shot at the current position of the player.
-
-        Sets the shot's .velocity attribute:
-        Start with a pygame.Vector2 of (0, 1).
-        .rotate() the vector in the direction the player is facing.
-        Scale it up (multiply by PLAYER_SHOOT_SPEED) to make it move faster.
-        """
+        """Creates a new Shot at the current position of the player."""
+        if self.shot_cooldown_timer > 0:
+            return
+        self.shot_cooldown_timer = PLAYER_SHOOT_COOLDOWN_SECONDS
         s = Shot(self.position.x, self.position.y)
         # Create unit vector pointing up (0, 1)
         # Rotate to match player's current facing direction
         unit_vector = pygame.Vector2(0, 1)
         rotated_vector = unit_vector.rotate(self.rotation)
         s.velocity = rotated_vector * PLAYER_SHOOT_SPEED
-
