@@ -14,9 +14,13 @@ class CircleShape(pygame.sprite.Sprite):
         self.radius = radius
 
     def draw(self, screen):
-        # must override
-        pass
+        # Subclasses must implement this method
+        raise NotImplementedError("Subclass must implement draw()")
 
     def update(self, dt):
-        # must override
-        pass
+        # Subclasses must implement this method
+        raise NotImplementedError("Subclass must implement update()")
+
+    def collides_with(self, other):
+        """Check whether circle overlaps."""
+        return self.position.distance_to(other.position) < self.radius + other.radius

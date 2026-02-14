@@ -1,29 +1,38 @@
 import pygame
 import random
 from asteroid import Asteroid
-from constants import *
+from constants import (
+    ASTEROID_KINDS,
+    ASTEROID_MAX_RADIUS,
+    ASTEROID_MIN_RADIUS,
+    ASTEROID_SPAWN_RATE_SECONDS,
+    SCREEN_HEIGHT,
+    SCREEN_WIDTH,
+)
 
 
 class AsteroidField(pygame.sprite.Sprite):
+    # Define spawn edges: [velocity_direction, position_function]
+    # Asteroids spawn just off-screen and move inward
     edges = [
         [
-            pygame.Vector2(1, 0),
-            lambda y: pygame.Vector2(-ASTEROID_MAX_RADIUS, y * SCREEN_HEIGHT),
+            pygame.Vector2(1, 0),  # Move right
+            lambda y: pygame.Vector2(-ASTEROID_MAX_RADIUS, y * SCREEN_HEIGHT),  # Spawn on left edge
         ],
         [
-            pygame.Vector2(-1, 0),
+            pygame.Vector2(-1, 0),  # Move left
             lambda y: pygame.Vector2(
-                SCREEN_WIDTH + ASTEROID_MAX_RADIUS, y * SCREEN_HEIGHT
+                SCREEN_WIDTH + ASTEROID_MAX_RADIUS, y * SCREEN_HEIGHT  # Spawn on right edge
             ),
         ],
         [
-            pygame.Vector2(0, 1),
-            lambda x: pygame.Vector2(x * SCREEN_WIDTH, -ASTEROID_MAX_RADIUS),
+            pygame.Vector2(0, 1),  # Move down
+            lambda x: pygame.Vector2(x * SCREEN_WIDTH, -ASTEROID_MAX_RADIUS),  # Spawn on top edge
         ],
         [
-            pygame.Vector2(0, -1),
+            pygame.Vector2(0, -1),  # Move up
             lambda x: pygame.Vector2(
-                x * SCREEN_WIDTH, SCREEN_HEIGHT + ASTEROID_MAX_RADIUS
+                x * SCREEN_WIDTH, SCREEN_HEIGHT + ASTEROID_MAX_RADIUS  # Spawn on bottom edge
             ),
         ],
     ]
