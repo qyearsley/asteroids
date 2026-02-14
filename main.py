@@ -63,7 +63,7 @@ def main():
             for s in shots:
                 if x.collides_with(s):
                     logger.log_event("asteroid_shot")
-                    x.kill()
+                    x.split()
                     s.kill()
 
         # Draw all game objects.
