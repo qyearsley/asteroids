@@ -9,7 +9,6 @@ from constants import (
     PLAYER_SPEED,
     LINE_WIDTH,
     PLAYER_SHOOT_SPEED,
-    PLAYER_SHOOT_COOLDOWN_SECONDS,
 )
 
 
