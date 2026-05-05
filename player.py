@@ -9,6 +9,9 @@ from constants import (
     PLAYER_SPEED,
     LINE_WIDTH,
     PLAYER_SHOOT_SPEED,
+    PLAYER_INVINCIBILITY_SECONDS,
+    SCREEN_WIDTH,
+    SCREEN_HEIGHT,
 )
 
 
@@ -17,6 +20,7 @@ class Player(CircleShape):
         super().__init__(x, y, PLAYER_RADIUS)
         self.rotation = 0
         self.shot_cooldown_timer = 0
+        self.invincibility_timer = 0
 
     def triangle(self):
         # Calculate triangle vertices for the player ship
@@ -33,6 +37,10 @@ class Player(CircleShape):
         return [a, b, c]
 
     def draw(self, screen):
+        # Blink rapidly while invincible to signal protection to the player.
+        # Multiplying by 10 and checking % 2 gives 5 blinks per second.
+        if self.invincibility_timer > 0 and int(self.invincibility_timer * 10) % 2 == 0:
+            return
         pygame.draw.polygon(screen, "white", self.triangle(), LINE_WIDTH)
 
     def update(self, dt):
@@ -48,6 +56,8 @@ class Player(CircleShape):
         if keys[pygame.K_SPACE]:
             self.shoot()
         self.shot_cooldown_timer -= dt
+        self.invincibility_timer -= dt
+        self.wrap_position()
 
     def move(self, dt):
         # Create unit vector pointing up (0, 1)
@@ -57,6 +67,13 @@ class Player(CircleShape):
         # Scale by speed and delta time for frame-independent movement
         rotated_with_speed_vector = rotated_vector * PLAYER_SPEED * dt
         self.position += rotated_with_speed_vector
+
+    def respawn(self):
+        """Reset position to center and grant invincibility."""
+        self.position = pygame.Vector2(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
+        self.velocity = pygame.Vector2(0, 0)
+        self.rotation = 0
+        self.invincibility_timer = PLAYER_INVINCIBILITY_SECONDS
 
     def shoot(self):
         """Creates a new Shot at the current position of the player."""

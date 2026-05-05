@@ -12,6 +12,7 @@ class Asteroid(CircleShape):
 
     def update(self, dt):
         self.position += self.velocity * dt
+        self.wrap_position()
 
     def split(self):
         """Split a asteroid into more asteroids if it's not a small asteroid."""
