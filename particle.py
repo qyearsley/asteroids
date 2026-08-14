@@ -1,13 +1,14 @@
-import pygame
 import random
+
+import pygame
 
 from circleshape import CircleShape
 from constants import (
     PARTICLE_COUNT,
-    PARTICLE_SPEED_MIN,
-    PARTICLE_SPEED_MAX,
     PARTICLE_LIFETIME,
     PARTICLE_RADIUS,
+    PARTICLE_SPEED_MAX,
+    PARTICLE_SPEED_MIN,
 )
 
 

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import logger
 import sys
 
 import pygame
@@ -7,6 +6,7 @@ import pygame
 import asteroid
 import asteroidfield
 import constants
+import logger
 import particle
 import player
 import shot

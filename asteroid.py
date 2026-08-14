@@ -1,9 +1,15 @@
-import pygame
 import random
-from logger import log_event
 
-from constants import ASTEROID_MIN_RADIUS, ASTEROID_SPLIT_ANGLE_MIN, ASTEROID_SPLIT_ANGLE_MAX, ASTEROID_SPLIT_SPEED_MULTIPLIER
+import pygame
+
 from circleshape import CircleShape
+from constants import (
+    ASTEROID_MIN_RADIUS,
+    ASTEROID_SPLIT_ANGLE_MAX,
+    ASTEROID_SPLIT_ANGLE_MIN,
+    ASTEROID_SPLIT_SPEED_MULTIPLIER,
+)
+from logger import log_event
 
 
 class Asteroid(CircleShape):

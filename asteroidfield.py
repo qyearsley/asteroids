@@ -1,5 +1,7 @@
-import pygame
 import random
+
+import pygame
+
 from asteroid import Asteroid
 from constants import (
     ASTEROID_KINDS,
@@ -17,9 +19,7 @@ class AsteroidField(pygame.sprite.Sprite):
     edges = [
         [
             pygame.Vector2(1, 0),  # Move right
-            lambda y: pygame.Vector2(
-                -ASTEROID_MAX_RADIUS, y * SCREEN_HEIGHT
-            ),  # Spawn on left edge
+            lambda y: pygame.Vector2(-ASTEROID_MAX_RADIUS, y * SCREEN_HEIGHT),  # Spawn on left edge
         ],
         [
             pygame.Vector2(-1, 0),  # Move left
@@ -30,9 +30,7 @@ class AsteroidField(pygame.sprite.Sprite):
         ],
         [
             pygame.Vector2(0, 1),  # Move down
-            lambda x: pygame.Vector2(
-                x * SCREEN_WIDTH, -ASTEROID_MAX_RADIUS
-            ),  # Spawn on top edge
+            lambda x: pygame.Vector2(x * SCREEN_WIDTH, -ASTEROID_MAX_RADIUS),  # Spawn on top edge
         ],
         [
             pygame.Vector2(0, -1),  # Move up

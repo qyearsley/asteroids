@@ -24,8 +24,8 @@ PLAYER_SHOOT_COOLDOWN_SECONDS = 0.3
 
 # Scoring - more points for smaller (harder) asteroids
 SCORE_PER_ASTEROID = {
-    3: 20,   # Large asteroid (radius 60)
-    2: 50,   # Medium asteroid (radius 40)
+    3: 20,  # Large asteroid (radius 60)
+    2: 50,  # Medium asteroid (radius 40)
     1: 100,  # Small asteroid (radius 20)
 }
 
@@ -34,8 +34,8 @@ PLAYER_LIVES = 3
 PLAYER_INVINCIBILITY_SECONDS = 2.0
 
 # Particle effects
-PARTICLE_COUNT = 8           # Number of particles per explosion
-PARTICLE_SPEED_MIN = 50      # Minimum particle speed (pixels/sec)
-PARTICLE_SPEED_MAX = 150     # Maximum particle speed (pixels/sec)
-PARTICLE_LIFETIME = 0.6      # How long particles live (seconds)
-PARTICLE_RADIUS = 2          # Size of each particle dot
+PARTICLE_COUNT = 8  # Number of particles per explosion
+PARTICLE_SPEED_MIN = 50  # Minimum particle speed (pixels/sec)
+PARTICLE_SPEED_MAX = 150  # Maximum particle speed (pixels/sec)
+PARTICLE_LIFETIME = 0.6  # How long particles live (seconds)
+PARTICLE_RADIUS = 2  # Size of each particle dot

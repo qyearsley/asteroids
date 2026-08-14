@@ -7,3 +7,46 @@ requires-python = ">=3.13"
 dependencies = [
     "pygame==2.6.1",
 ]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0.0",
+    "ruff>=0.8.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# The game modules live at the repo root, so tests can `import player` etc.
+pythonpath = ["."]
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "SIM", # flake8-simplify
+]
+ignore = [
+    "E501",  # line too long (handled by formatter)
+]
+
+[tool.ruff.lint.isort]
+known-first-party = [
+    "asteroid",
+    "asteroidfield",
+    "circleshape",
+    "constants",
+    "logger",
+    "particle",
+    "player",
+    "shot",
+]
+force-sort-within-sections = true
