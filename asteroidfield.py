@@ -1,5 +1,3 @@
-import random
-
 import pygame
 
 from asteroid import Asteroid
@@ -11,6 +9,7 @@ from constants import (
     SCREEN_HEIGHT,
     SCREEN_WIDTH,
 )
+import rng
 
 
 class AsteroidField(pygame.sprite.Sprite):
@@ -55,10 +54,10 @@ class AsteroidField(pygame.sprite.Sprite):
             self.spawn_timer = 0
 
             # Spawn a new asteroid at a random edge
-            edge = random.choice(self.edges)
-            speed = random.randint(40, 100)
+            edge = rng.spawns.choice(self.edges)
+            speed = rng.spawns.randint(40, 100)
             velocity = edge[0] * speed
-            velocity = velocity.rotate(random.randint(-30, 30))
-            position = edge[1](random.uniform(0, 1))
-            kind = random.randint(1, ASTEROID_KINDS)
+            velocity = velocity.rotate(rng.spawns.randint(-30, 30))
+            position = edge[1](rng.spawns.uniform(0, 1))
+            kind = rng.spawns.randint(1, ASTEROID_KINDS)
             self.spawn(ASTEROID_MIN_RADIUS * kind, position, velocity)

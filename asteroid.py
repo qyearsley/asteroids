@@ -1,5 +1,3 @@
-import random
-
 import pygame
 
 from circleshape import CircleShape
@@ -10,6 +8,7 @@ from constants import (
     ASTEROID_SPLIT_SPEED_MULTIPLIER,
 )
 from logger import log_event
+import rng
 
 
 class Asteroid(CircleShape):
@@ -27,7 +26,7 @@ class Asteroid(CircleShape):
             return
         log_event("asteroid_split")
         # 1. Calculate all necessary values first
-        angle = random.uniform(ASTEROID_SPLIT_ANGLE_MIN, ASTEROID_SPLIT_ANGLE_MAX)
+        angle = rng.effects.uniform(ASTEROID_SPLIT_ANGLE_MIN, ASTEROID_SPLIT_ANGLE_MAX)
         new_velocity1 = self.velocity.rotate(angle) * ASTEROID_SPLIT_SPEED_MULTIPLIER
         new_velocity2 = self.velocity.rotate(-angle) * ASTEROID_SPLIT_SPEED_MULTIPLIER
         new_radius = self.radius - ASTEROID_MIN_RADIUS

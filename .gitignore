@@ -11,4 +11,5 @@ wheels/
 
 game_state.jsonl
 game_events.jsonl
+best_results.json
 .ruff_cache/

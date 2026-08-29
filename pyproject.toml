@@ -42,11 +42,14 @@ ignore = [
 known-first-party = [
     "asteroid",
     "asteroidfield",
+    "bestresults",
     "circleshape",
     "constants",
     "logger",
+    "main",
     "particle",
     "player",
+    "rng",
     "shot",
 ]
 force-sort-within-sections = true

@@ -1,5 +1,3 @@
-import random
-
 import pygame
 
 from circleshape import CircleShape
@@ -10,6 +8,7 @@ from constants import (
     PARTICLE_SPEED_MAX,
     PARTICLE_SPEED_MIN,
 )
+import rng
 
 
 class Particle(CircleShape):
@@ -19,8 +18,8 @@ class Particle(CircleShape):
         super().__init__(x, y, PARTICLE_RADIUS)
         self.lifetime = PARTICLE_LIFETIME
         # Pick a random direction (0-360 degrees) and random speed.
-        angle = random.uniform(0, 360)
-        speed = random.uniform(PARTICLE_SPEED_MIN, PARTICLE_SPEED_MAX)
+        angle = rng.effects.uniform(0, 360)
+        speed = rng.effects.uniform(PARTICLE_SPEED_MIN, PARTICLE_SPEED_MAX)
         self.velocity = pygame.Vector2(0, 1).rotate(angle) * speed
 
     def draw(self, screen):

@@ -33,6 +33,17 @@ SCORE_PER_ASTEROID = {
 PLAYER_LIVES = 3
 PLAYER_INVINCIBILITY_SECONDS = 2.0
 
+# Game modes
+MODE_CLASSIC = "classic"  # Play until you run out of lives
+MODE_TIME_TRIAL = "time-trial"  # Destroy a set number of asteroids as fast as possible
+TIME_TRIAL_TARGET_ASTEROIDS = 25  # How many to destroy to finish a time trial
+
+# Local best results, kept apart from the logger's jsonl files
+BEST_RESULTS_FILE = "best_results.json"
+
+# Text layout
+TEXT_LINE_HEIGHT = 40  # Vertical spacing between lines on the menu screens
+
 # Particle effects
 PARTICLE_COUNT = 8  # Number of particles per explosion
 PARTICLE_SPEED_MIN = 50  # Minimum particle speed (pixels/sec)
