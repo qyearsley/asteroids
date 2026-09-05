@@ -66,6 +66,11 @@ BEST_RESULTS_FILE = "best_results.json"
 
 # Text layout
 TEXT_LINE_HEIGHT = 40  # Vertical spacing between lines on the menu screens
+# The HUD is tighter than the menus: it is an overlay in the corner of a playing
+# field, not centred prose, and in a time trial it is four lines deep. Its own
+# constant rather than TEXT_LINE_HEIGHT, which a tidy-up briefly reused here and
+# spread the HUD from 90 pixels to 130 without meaning to.
+HUD_LINE_HEIGHT = 30
 
 # Particle effects
 PARTICLE_COUNT = 8  # Number of particles per explosion

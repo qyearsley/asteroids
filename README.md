@@ -46,7 +46,7 @@ uv run main.py --seed 1234                      # classic on a fixed sequence
 Destroy asteroids to survive. Large asteroids split into two smaller ones when
 shot, so clearing a big one makes the screen busier before it makes it emptier.
 You lose a life when an asteroid hits your ship, and respawn in the middle with
-a couple of seconds of invincibility. Bullets fade after
+a couple of seconds of invincibility. Bullets disappear after
 `SHOT_LIFETIME_SECONDS`, so a shot has a reach rather than circling the screen
 until it finds something.
 

@@ -1,7 +1,8 @@
 """Diagnostic logging for a play session.
 
-Two files, both gitignored, both written from the repository's working
-directory: `game_state.jsonl` gets one snapshot a second, and
+Two files, both gitignored, both written to whatever directory the game was
+launched from -- the repo root if you followed the README, and both names are
+relative: `game_state.jsonl` gets one snapshot a second, and
 `game_events.jsonl` gets a line whenever something happens. They exist so a
 finished run can be read back without a display, which is the only way most of
 this game can be inspected at all.

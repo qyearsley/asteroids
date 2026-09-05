@@ -5,7 +5,7 @@ from constants import SHOT_LIFETIME_SECONDS, SHOT_RADIUS
 
 
 class Shot(CircleShape):
-    """A bullet. Wraps at the screen edge, and fades after a fixed time.
+    """A bullet. Wraps at the screen edge, and disappears after a fixed time.
 
     The lifetime is what stops a shot being permanent. Without it a bullet
     circled the screen until it hit something, so a run accumulated one more

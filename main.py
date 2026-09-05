@@ -181,7 +181,7 @@ def draw_hud(screen, font, mode, score, lives, destroyed, elapsed):
         lines.append(f"Time: {format_time(elapsed)}")
         lines.append(f"Asteroids: {destroyed} / {constants.TIME_TRIAL_TARGET_ASTEROIDS}")
     for i, line in enumerate(lines):
-        screen.blit(font.render(line, True, "white"), (10, 10 + i * constants.TEXT_LINE_HEIGHT))
+        screen.blit(font.render(line, True, "white"), (10, 10 + i * constants.HUD_LINE_HEIGHT))
 
 
 def resolve_collisions(p, asteroids, shots):
