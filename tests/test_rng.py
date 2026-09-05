@@ -64,8 +64,7 @@ def test_explosions_and_splits_do_not_shift_the_spawn_sequence(asteroids):
     assert spawn_sequence(99, asteroids, disturb=True) == undisturbed
 
 
-def test_splits_are_repeatable_under_the_same_seed(container_for, monkeypatch):
-    monkeypatch.setattr("asteroid.log_event", lambda *args, **kwargs: None)
+def test_splits_are_repeatable_under_the_same_seed(container_for):
     asteroids = container_for(Asteroid)
 
     def children_of_a_split():

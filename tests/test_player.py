@@ -1,4 +1,4 @@
-"""Tests for the player ship: hull geometry, shooting cooldown, and respawn."""
+"""Tests for the player ship: hull geometry, movement, shooting, and respawn."""
 
 import pygame
 import pytest
@@ -6,6 +6,7 @@ import pytest
 from constants import (
     PLAYER_INVINCIBILITY_SECONDS,
     PLAYER_SHOOT_SPEED,
+    PLAYER_SPEED,
     SCREEN_HEIGHT,
     SCREEN_WIDTH,
 )
@@ -79,3 +80,45 @@ def test_respawn_recentres_the_ship_and_grants_invincibility():
     assert player.velocity == pygame.Vector2(0, 0)
     assert player.rotation == 0
     assert player.invincibility_timer == PLAYER_INVINCIBILITY_SECONDS
+
+
+class TestMove:
+    """`Player.move` had no tests, which is why nothing recorded that the ship
+    has no inertia -- it adds to `position` and never touches the inherited
+    `velocity`. That is a design choice rather than a defect, but an untested
+    one reads as an accident."""
+
+    def test_thrust_moves_the_ship_along_its_heading(self):
+        ship = Player(300, 300)
+        ship.rotation = 0  # Facing +y, the direction `move` treats as forward.
+        ship.move(1.0)
+        assert ship.position.y == pytest.approx(300 + PLAYER_SPEED)
+        assert ship.position.x == pytest.approx(300)
+
+    def test_reverse_is_the_same_move_with_a_negative_step(self):
+        ship = Player(300, 300)
+        ship.rotation = 0
+        ship.move(-1.0)
+        assert ship.position.y == pytest.approx(300 - PLAYER_SPEED)
+
+    def test_turning_first_changes_where_thrust_takes_it(self):
+        ship = Player(300, 300)
+        ship.rotation = 90
+        ship.move(1.0)
+        assert ship.position.x == pytest.approx(300 - PLAYER_SPEED)
+        assert ship.position.y == pytest.approx(300)
+
+    def test_distance_is_proportional_to_the_step(self):
+        far = Player(0, 0)
+        near = Player(0, 0)
+        far.move(1.0)
+        near.move(0.5)
+        assert far.position.length() == pytest.approx(near.position.length() * 2)
+
+    def test_the_ship_never_gains_velocity(self):
+        # No inertia: release the key and it stops dead. The day this fails is
+        # the day someone added drift, and the README says so too.
+        ship = Player(300, 300)
+        for _ in range(10):
+            ship.move(0.1)
+        assert ship.velocity == pygame.Vector2(0, 0)

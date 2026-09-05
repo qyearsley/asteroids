@@ -7,12 +7,6 @@ from asteroid import Asteroid
 from constants import ASTEROID_MIN_RADIUS, ASTEROID_SPLIT_SPEED_MULTIPLIER
 
 
-@pytest.fixture(autouse=True)
-def quiet_event_log(monkeypatch):
-    """`split()` appends to game_events.jsonl; keep tests off the filesystem."""
-    monkeypatch.setattr("asteroid.log_event", lambda *args, **kwargs: None)
-
-
 @pytest.fixture
 def asteroids(container_for):
     return container_for(Asteroid)

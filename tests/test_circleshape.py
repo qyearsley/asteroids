@@ -44,3 +44,29 @@ class TestCollidesWith:
     def test_exactly_touching_circles_do_not_collide(self):
         # The check is a strict `<`, so grazing at exactly r1 + r2 counts as a miss.
         assert not CircleShape(0, 0, 10).collides_with(CircleShape(30, 0, 20))
+
+
+class TestWrappingFurtherThanOneScreen:
+    """The `elif` version moved an object by exactly one screen and no more.
+
+    Nothing in normal play travels that far in a frame -- the fastest thing is a
+    bullet at 500 px/s -- but a paused window resumed after a long stall hands
+    every sprite one enormous `dt`, and the old version left them still off the
+    edge for however many frames it took to walk back.
+    """
+
+    @pytest.mark.parametrize(
+        "x,y",
+        [
+            (SCREEN_WIDTH * 2.5, 100),
+            (-SCREEN_WIDTH * 1.5, 100),
+            (100, SCREEN_HEIGHT * 3.5),
+            (100, -SCREEN_HEIGHT * 2.5),
+            (SCREEN_WIDTH * 4, SCREEN_HEIGHT * 4),
+        ],
+    )
+    def test_arrives_on_screen_in_one_step(self, x, y):
+        shape = CircleShape(x, y, 10)
+        shape.wrap_position()
+        assert 0 <= shape.position.x < SCREEN_WIDTH
+        assert 0 <= shape.position.y < SCREEN_HEIGHT

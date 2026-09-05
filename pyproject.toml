@@ -18,6 +18,9 @@ dev = [
 testpaths = ["tests"]
 # The game modules live at the repo root, so tests can `import player` etc.
 pythonpath = ["."]
+markers = [
+    "real_logger: opt out of the conftest fixture that muzzles the diagnostic logger",
+]
 
 [tool.ruff]
 line-length = 100

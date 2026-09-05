@@ -181,7 +181,49 @@ def draw_hud(screen, font, mode, score, lives, destroyed, elapsed):
         lines.append(f"Time: {format_time(elapsed)}")
         lines.append(f"Asteroids: {destroyed} / {constants.TIME_TRIAL_TARGET_ASTEROIDS}")
     for i, line in enumerate(lines):
-        screen.blit(font.render(line, True, "white"), (10, 10 + i * 30))
+        screen.blit(font.render(line, True, "white"), (10, 10 + i * constants.TEXT_LINE_HEIGHT))
+
+
+def resolve_collisions(p, asteroids, shots):
+    """Settle one frame of ship-and-bullet collisions, and say what it cost.
+
+    Split out of the main loop so it can be tested: it needs no display, and it
+    is where the scoring actually happens. Everything it changes it changes
+    through the sprites themselves -- killing shots, splitting asteroids,
+    respawning the ship -- so the caller only has to add up what comes back.
+
+    Args:
+        p: The player.
+        asteroids: The asteroid group.
+        shots: The bullet group.
+
+    Returns:
+        `(hits, points, destroyed)` -- lives lost, score earned, and asteroids
+        broken this frame.
+    """
+    hits = 0
+    points = 0
+    destroyed = 0
+    for x in asteroids:
+        if p.invincibility_timer <= 0 and x.collides_with(p):
+            logger.log_event("player_hit")
+            hits += 1
+            p.respawn()
+        for s in shots:
+            if x.collides_with(s):
+                logger.log_event("asteroid_shot")
+                kind = int(x.radius / constants.ASTEROID_MIN_RADIUS)
+                points += constants.SCORE_PER_ASTEROID.get(kind, constants.SCORE_FOR_ODD_ASTEROID)
+                destroyed += 1
+                particle.spawn_explosion(x.position.x, x.position.y)
+                x.split()
+                s.kill()
+                # `x` is dead now. Without this the loop kept testing the
+                # remaining shots against it, so two shots landing on one
+                # asteroid in the same frame scored it twice, split it twice --
+                # four children instead of two -- and drew two explosions.
+                break
+    return hits, points, destroyed
 
 
 def play_run(screen, clock, font, mode, seed):
@@ -216,9 +258,22 @@ def play_run(screen, clock, font, mode, seed):
     elapsed = 0.0  # Seconds of play, not counting time spent paused
     paused = False
 
+    logger.start_run()
+
     dt = 0  # Delta time in seconds
     while True:
-        logger.log_state()
+        # Named explicitly rather than harvested from this function's locals.
+        # The logger used to read them through `inspect`, which quietly made
+        # every local name in here part of its interface.
+        logger.log_state(
+            {
+                "updatable": updatable,
+                "drawable": drawable,
+                "asteroids": asteroids,
+                "shots": shots,
+            },
+            screen,
+        )
 
         # Handle quit, pause and give-up events.
         for event in pygame.event.get():
@@ -241,21 +296,10 @@ def play_run(screen, clock, font, mode, seed):
             for x in updatable:
                 x.update(dt)
 
-            # Check for collisions between player and asteroids.
-            for x in asteroids:
-                if p.invincibility_timer <= 0 and x.collides_with(p):
-                    logger.log_event("player_hit")
-                    lives -= 1
-                    p.respawn()
-                for s in shots:
-                    if x.collides_with(s):
-                        logger.log_event("asteroid_shot")
-                        kind = int(x.radius / constants.ASTEROID_MIN_RADIUS)
-                        score += constants.SCORE_PER_ASTEROID.get(kind, 20)
-                        destroyed += 1
-                        particle.spawn_explosion(x.position.x, x.position.y)
-                        x.split()
-                        s.kill()
+            hits, points, smashed = resolve_collisions(p, asteroids, shots)
+            lives -= hits
+            score += points
+            destroyed += smashed
 
             # The run is over once the lives are gone, or the trial target is met.
             result = make_result(mode, seed, score, destroyed, elapsed)
@@ -300,8 +344,10 @@ def main(argv=None):
             )
         elif state is State.PLAYING:
             result, state = play_run(screen, clock, font, mode, seed)
-            if state is State.GAME_OVER:
-                improved, best = bestresults.record(mode, seed, result)
+            # Recorded however the run ended, closing the window included. It
+            # used to be recorded only on GAME_OVER, so a personal best set in a
+            # run you then quit out of was simply thrown away.
+            improved, best = bestresults.record(mode, seed, result)
         elif state is State.GAME_OVER:
             state = wait_for_choice(
                 screen, clock, font, result_lines(result, best, improved), pygame.K_r

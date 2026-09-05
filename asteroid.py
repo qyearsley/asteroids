@@ -7,11 +7,13 @@ from constants import (
     ASTEROID_SPLIT_ANGLE_MIN,
     ASTEROID_SPLIT_SPEED_MULTIPLIER,
 )
-from logger import log_event
+import logger
 import rng
 
 
 class Asteroid(CircleShape):
+    """A drifting rock that wraps at the screen edge and breaks in two when shot."""
+
     def draw(self, screen):
         pygame.draw.circle(screen, "white", self.position, self.radius)
 
@@ -20,19 +22,27 @@ class Asteroid(CircleShape):
         self.wrap_position()
 
     def split(self):
-        """Split a asteroid into more asteroids if it's not a small asteroid."""
+        """Break this asteroid up, or simply remove it if it is already small.
+
+        Always kills this asteroid first, whichever happens next: a shot that
+        lands is a shot that lands. Only one larger than the minimum radius
+        leaves children -- two of them, deflected symmetrically off the parent's
+        heading and slightly faster, which is what turns one big slow target
+        into a spreading problem.
+
+        The two velocities are worked out before either child exists, because a
+        child registers itself with the sprite groups the moment it is built and
+        the deflection has to be symmetric about the parent's original heading.
+        """
         self.kill()
         if self.radius <= ASTEROID_MIN_RADIUS:
             return
-        log_event("asteroid_split")
-        # 1. Calculate all necessary values first
+        logger.log_event("asteroid_split")
         angle = rng.effects.uniform(ASTEROID_SPLIT_ANGLE_MIN, ASTEROID_SPLIT_ANGLE_MAX)
         new_velocity1 = self.velocity.rotate(angle) * ASTEROID_SPLIT_SPEED_MULTIPLIER
         new_velocity2 = self.velocity.rotate(-angle) * ASTEROID_SPLIT_SPEED_MULTIPLIER
         new_radius = self.radius - ASTEROID_MIN_RADIUS
-        # 2. Create the new objects
         a1 = Asteroid(self.position.x, self.position.y, new_radius)
         a2 = Asteroid(self.position.x, self.position.y, new_radius)
-        # 3. Assign the pre-calculated velocities
         a1.velocity = new_velocity1
         a2.velocity = new_velocity2

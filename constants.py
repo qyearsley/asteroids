@@ -7,6 +7,9 @@ PLAYER_RADIUS = 20
 LINE_WIDTH = 2
 PLAYER_TURN_SPEED = 300  # Degrees per second
 PLAYER_SPEED = 200  # Pixels per second
+# Half the hull's width, as a fraction of its radius. Below 1 makes the ship
+# longer than it is wide, which is what makes it read as pointing somewhere.
+HULL_WIDTH_RATIO = 1 / 1.5
 
 # Asteroid properties
 ASTEROID_MIN_RADIUS = 20
@@ -21,6 +24,21 @@ ASTEROID_SPLIT_SPEED_MULTIPLIER = 1.2  # Speed boost when splitting
 SHOT_RADIUS = 5
 PLAYER_SHOOT_SPEED = 500
 PLAYER_SHOOT_COOLDOWN_SECONDS = 0.3
+# How long a bullet lives before it fades. Bullets used to have no lifetime at
+# all: they wrapped at the screen edge and flew until they hit something, so at
+# one shot every 0.3s a run accumulated permanent sprites for as long as it
+# lasted, and holding fire cleared the field by attrition. This is the single
+# number that decides how far a shot reaches -- 1.6s at 500px/s is about 800
+# pixels, roughly two thirds of the screen, which is the classic arcade range.
+SHOT_LIFETIME_SECONDS = 1.6
+
+# Difficulty ramp. The spawn interval starts at ASTEROID_SPAWN_RATE_SECONDS and
+# shortens towards ASTEROID_SPAWN_RATE_FLOOR over ASTEROID_RAMP_SECONDS, after
+# which it stays there. Without it minute ten of a classic run was identical to
+# minute one -- the only thing that grew was the count already on screen, so the
+# game got harder by clutter rather than by pressure.
+ASTEROID_SPAWN_RATE_FLOOR = 0.3
+ASTEROID_RAMP_SECONDS = 180.0
 
 # Scoring - more points for smaller (harder) asteroids
 SCORE_PER_ASTEROID = {
@@ -28,6 +46,11 @@ SCORE_PER_ASTEROID = {
     2: 50,  # Medium asteroid (radius 40)
     1: 100,  # Small asteroid (radius 20)
 }
+# What an asteroid whose radius is not a clean multiple of the minimum is worth.
+# Nothing produces one today -- `split` subtracts exactly one minimum radius --
+# but the lookup needs a fallback, and a bare literal at the call site read as a
+# magic number that only happened to match the largest size.
+SCORE_FOR_ODD_ASTEROID = SCORE_PER_ASTEROID[ASTEROID_KINDS]
 
 # Lives
 PLAYER_LIVES = 3

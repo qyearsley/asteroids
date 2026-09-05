@@ -2,6 +2,7 @@ import pygame
 
 from circleshape import CircleShape
 from constants import (
+    HULL_WIDTH_RATIO,
     LINE_WIDTH,
     PLAYER_INVINCIBILITY_SECONDS,
     PLAYER_RADIUS,
@@ -16,6 +17,14 @@ from shot import Shot
 
 
 class Player(CircleShape):
+    """The ship: a triangle that turns, thrusts, and fires.
+
+    Movement is direct translation rather than thrust and drift -- `move` adds
+    to `position` and never touches the inherited `velocity`, so the ship stops
+    the moment a key comes up. Classic Asteroids coasts; this does not, and
+    changing it is a change to how the whole game feels rather than a fix.
+    """
+
     def __init__(self, x, y):
         super().__init__(x, y, PLAYER_RADIUS)
         self.rotation = 0
@@ -23,18 +32,17 @@ class Player(CircleShape):
         self.invincibility_timer = 0
 
     def triangle(self):
-        # Calculate triangle vertices for the player ship
-        # Forward vector points in direction of rotation
+        """The ship's three corners, in world coordinates: nose, back left, back right.
+
+        The hull is `HULL_WIDTH_RATIO` times narrower than it is long, which is
+        what makes it read as pointing somewhere.
+        """
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
-        # Right vector is perpendicular, scaled down for ship width
-        right = pygame.Vector2(0, 1).rotate(self.rotation + 90) * self.radius / 1.5
-        # Front point of ship
-        a = self.position + forward * self.radius
-        # Back left point
-        b = self.position - forward * self.radius - right
-        # Back right point
-        c = self.position - forward * self.radius + right
-        return [a, b, c]
+        right = pygame.Vector2(0, 1).rotate(self.rotation + 90) * self.radius * HULL_WIDTH_RATIO
+        nose = self.position + forward * self.radius
+        back_left = self.position - forward * self.radius - right
+        back_right = self.position - forward * self.radius + right
+        return [nose, back_left, back_right]
 
     def draw(self, screen):
         # Blink rapidly while invincible to signal protection to the player.
@@ -55,18 +63,24 @@ class Player(CircleShape):
             self.move(-dt)
         if keys[pygame.K_SPACE]:
             self.shoot()
-        self.shot_cooldown_timer -= dt
-        self.invincibility_timer -= dt
+        # Floored at zero. Left to run, both drift further negative every frame
+        # of a long run, which is harmless today and is the sort of thing that
+        # stops being harmless the moment something starts reading the value.
+        self.shot_cooldown_timer = max(0.0, self.shot_cooldown_timer - dt)
+        self.invincibility_timer = max(0.0, self.invincibility_timer - dt)
         self.wrap_position()
 
     def move(self, dt):
-        # Create unit vector pointing up (0, 1)
-        unit_vector = pygame.Vector2(0, 1)
-        # Rotate to match player's current facing direction
-        rotated_vector = unit_vector.rotate(self.rotation)
-        # Scale by speed and delta time for frame-independent movement
-        rotated_with_speed_vector = rotated_vector * PLAYER_SPEED * dt
-        self.position += rotated_with_speed_vector
+        """Slide along the current heading. A negative `dt` reverses.
+
+        `dt` rather than a fixed step, so the ship covers the same ground per
+        second whatever the frame rate.
+        """
+        self.position += self._heading() * PLAYER_SPEED * dt
+
+    def _heading(self):
+        """A unit vector pointing where the nose points."""
+        return pygame.Vector2(0, 1).rotate(self.rotation)
 
     def respawn(self):
         """Reset position to center and grant invincibility."""
@@ -80,9 +94,5 @@ class Player(CircleShape):
         if self.shot_cooldown_timer > 0:
             return
         self.shot_cooldown_timer = PLAYER_SHOOT_COOLDOWN_SECONDS
-        s = Shot(self.position.x, self.position.y)
-        # Create unit vector pointing up (0, 1)
-        # Rotate to match player's current facing direction
-        unit_vector = pygame.Vector2(0, 1)
-        rotated_vector = unit_vector.rotate(self.rotation)
-        s.velocity = rotated_vector * PLAYER_SHOOT_SPEED
+        bullet = Shot(self.position.x, self.position.y)
+        bullet.velocity = self._heading() * PLAYER_SHOOT_SPEED

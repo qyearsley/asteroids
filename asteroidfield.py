@@ -5,6 +5,8 @@ from constants import (
     ASTEROID_KINDS,
     ASTEROID_MAX_RADIUS,
     ASTEROID_MIN_RADIUS,
+    ASTEROID_RAMP_SECONDS,
+    ASTEROID_SPAWN_RATE_FLOOR,
     ASTEROID_SPAWN_RATE_SECONDS,
     SCREEN_HEIGHT,
     SCREEN_WIDTH,
@@ -41,17 +43,45 @@ class AsteroidField(pygame.sprite.Sprite):
     ]
 
     def __init__(self):
-        pygame.sprite.Sprite.__init__(self, self.containers)
+        # Guarded like CircleShape.__init__, rather than assuming the caller
+        # assigned `containers` first. The two used to disagree, so a field
+        # built without them raised AttributeError while every other sprite
+        # simply went ungrouped.
+        if hasattr(self, "containers"):
+            pygame.sprite.Sprite.__init__(self, self.containers)
+        else:
+            pygame.sprite.Sprite.__init__(self)
         self.spawn_timer = 0.0
+        self.elapsed = 0.0
+
+    def spawn_interval(self):
+        """Seconds between spawns right now, which shortens as a run goes on.
+
+        A straight line from ASTEROID_SPAWN_RATE_SECONDS down to
+        ASTEROID_SPAWN_RATE_FLOOR over ASTEROID_RAMP_SECONDS, then flat. The
+        interval was a constant before this, so a classic run at minute ten
+        asked exactly as much of the player as minute one -- the field grew, but
+        only because nothing had cleared it.
+        """
+        progress = min(1.0, self.elapsed / ASTEROID_RAMP_SECONDS)
+        span = ASTEROID_SPAWN_RATE_SECONDS - ASTEROID_SPAWN_RATE_FLOOR
+        return ASTEROID_SPAWN_RATE_SECONDS - span * progress
 
     def spawn(self, radius, position, velocity):
         asteroid = Asteroid(position.x, position.y, radius)
         asteroid.velocity = velocity
+        return asteroid
 
     def update(self, dt):
+        self.elapsed += dt
         self.spawn_timer += dt
-        if self.spawn_timer > ASTEROID_SPAWN_RATE_SECONDS:
-            self.spawn_timer = 0
+        interval = self.spawn_interval()
+        if self.spawn_timer > interval:
+            # Carry the overshoot rather than dropping it. Zeroing the timer
+            # quantized the real interval to whole frames and made it drift
+            # slightly long, which is the sort of thing that makes two runs on
+            # one seed stop matching.
+            self.spawn_timer -= interval
 
             # Spawn a new asteroid at a random edge
             edge = rng.spawns.choice(self.edges)
